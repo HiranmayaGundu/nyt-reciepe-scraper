@@ -2,11 +2,22 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
+options = Options()
+options.headless = True
+
+driver = webdriver.Firefox(options=options)
+
 
 def get_nyt_recopies(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'html.parser')
+    # response = requests.get(url)
+    driver.get(url)
+
+    html = driver.page_source
+    # response.raise_for_status()
+    soup = BeautifulSoup(html, 'html.parser')
     stats_table = soup.find("dl", class_=lambda x: x.startswith("stats_statsTable") if x else False)
     yield_time = stats_table.find("dd", class_="pantry--ui").get_text()
     rating_data = stats_table.find("dd", class_=lambda x: "stats_ratingInfo" in x if x else False)
